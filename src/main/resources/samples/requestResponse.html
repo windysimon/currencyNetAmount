@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<p lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>SSE Example</title>
+    </head>
+<p>
+<p><span>currency code: <input type="text" class="curCode" /><button style="margin-left: 20px" type="button" id="search">search</button></span></p>
+<p>currency net amount: <input type="text" class="curAmount" /></p>
+
+<script>
+        let $ = document.querySelector.bind(document);
+
+        $("#search").onclick = function(){
+            let sCode = $('.curCode').value;
+            if(sCode.length==0){
+                alert("please enter the valid code!");
+                return;
+            }
+            let ajax = new XMLHttpRequest();
+            let path = 'http://localhost:'+window.location.port+'/search?sCode='+sCode;
+            ajax.open('get', path);
+            ajax.onreadystatechange = function(){
+                if(ajax.readyState==4 && ajax.status==200){
+                    if(ajax.responseText=="null"){
+                        alert("No net amount for code "+sCode);
+                        $(".curAmount").value="";
+                    }else{
+                        $(".curAmount").value=ajax.responseText;
+                    }
+                }
+            }
+            ajax.send();
+        }
+</script>
+
+</body>
+</html>

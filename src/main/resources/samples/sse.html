@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<p lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Example</title>
+</head>
+<p>
+
+<p>Connection status: <span class="status">Not started. <input type="button" value="start" id="startButton"></span></p>
+<p><span>currency code: <input type="text" class="curCode" /><button style="margin-left: 20px" type="button" id="search">search</button></span></p>
+<p>currency net amount: <input type="text" class="curAmount" /></p>
+
+<script>
+    let curAmoutMap = new Map();
+    document.getElementById('startButton').addEventListener('click', _ => {
+        let $ = document.querySelector.bind(document);
+        let status = $('.status');
+        let source = new EventSource('/sse/counter');
+
+        source.addEventListener('open', e => {
+            console.log('Connected', e);
+            status.textContent = 'Connected';
+        });
+
+        source.addEventListener('error', e => {
+            console.log('error', e);
+            status.textContent = 'Error';
+        });
+
+        source.addEventListener('message', e => {
+            let resMap=e.data.split(" ");
+            curAmoutMap.set(resMap[0],resMap[1]);
+        });
+
+        document.getElementById('search').addEventListener('click', _ => {
+            let scode = $(".curCode").value;
+            let sValue = "";
+            if(scode.length==0){
+                alert("please enter the valid code!");
+            }else{
+                sValue = curAmoutMap.get(scode);
+                if(sValue==undefined||sValue=='0'){
+                    alert("No net amount for code "+scode);
+                }else{
+                    $(".curAmount").value=sValue;
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
